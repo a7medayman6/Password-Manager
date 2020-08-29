@@ -1,5 +1,6 @@
 import base64
 import sqlite3
+import getpass
 from sqlite3 import Error
 
 def connect(db_name):
@@ -68,11 +69,11 @@ def print_rows(rows):
 
 
 master_password = "cGFzc3dvcmQ=" #base64 encoding for 'password'
-master_pass = input("Enter the master password:\t")
+master_pass = getpass.getpass("Enter the master password:\t")
 
 while master_pass != base64.b64decode(master_password).decode('utf-8'):
     print("WRONG PASSWORD.\n")
-    master_pass = input("Enter the master password:\t")
+    master_pass = getpass.getpass("Enter the master password:\t")
 
 DB_NAME = "manager.db"
 TABLE_NAME = "service"
@@ -89,12 +90,13 @@ if CONN is not None:
 
         if choice == 'add':
             s_name = input("Service Name:\t")
-            s_pass = input("Service Password:\t")
+            s_pass = getpass.getpass("Service Password:\t")
             insert_service(CUR, TABLE_NAME, s_name, s_pass)
             CONN.commit()
         elif choice == 'get':
             ROWS = select_all(CUR, TABLE_NAME)
             if len(ROWS) != 0:
+                print("\nid\tservice\n")
                 print_rows(ROWS)
                 id = input("Choose the service id:\t")
                 while not is_integer(id):
@@ -102,6 +104,7 @@ if CONN is not None:
                     id = input("Choose the service id:\t")
                 ROWS = select_row(CUR, TABLE_NAME, id)
                 if len(ROWS) != 0:
+                    print("\nservice\tpassword\n")
                     print_rows(ROWS)
                 else:
                     print("There is no services added.") 
@@ -113,6 +116,7 @@ if CONN is not None:
         elif choice == 'del':
             ROWS = select_all(CUR, TABLE_NAME)
             if len(ROWS) != 0:
+                print("\nid\tservice\n")
                 print_rows(ROWS)
                 id = input("Choose the service id:\t")
                 while not is_integer(id):
@@ -133,7 +137,7 @@ if CONN is not None:
                     print("ERROR: id must be integer")
                     id = input("Choose the service id:\t")
                 s_name = input("Service Name:\t")
-                s_pass = input("Service Password:\t")    
+                s_pass = getpass.getpass("Service Password:\t")    
                 update_service(CUR, TABLE_NAME, id, s_name, s_pass)
                 CONN.commit()
             else:
